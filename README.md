@@ -17,7 +17,7 @@ This project demonstrates how to connect two containers running on separate virt
 - [License](#license)
 
 ## Overview
-The goal of this project is to establish communication between two containers running on different VMs (VM1: `185.231.59.229`, VM2: `46.249.101.68`) using Docker's Overlay network and VXLAN tunneling. This approach avoids exposing container ports publicly, ensuring secure and scalable communication.
+The goal of this project is to establish communication between two containers running on different VMs (VM1: `187.10.1.1`, VM2: `187.20.1.1`) using Docker's Overlay network and VXLAN tunneling. This approach avoids exposing container ports publicly, ensuring secure and scalable communication.
 
 Key components:
 - **VXLAN**: Creates a layer 2 tunnel between VMs to encapsulate container traffic.
@@ -26,8 +26,8 @@ Key components:
 
 ## Prerequisites
 - Two VMs running a Linux-based OS (e.g., Ubuntu) with the following IPs:
-  - VM1: `185.231.59.229`
-  - VM2: `46.249.101.68`
+  - VM1: `187.10.1.1`
+  - VM2: `187.20.1.1`
 - Docker installed on both VMs (`sudo apt install docker.io`).
 - Root or sudo access on both VMs.
 - Network connectivity between VMs (test with `ping`).
@@ -50,16 +50,16 @@ sudo ufw allow 7946/udp
 ### Step 1: Configure VXLAN Tunnel
 Create a VXLAN tunnel to enable layer 2 connectivity between VMs.
 
-**On VM1 (`185.231.59.229`)**:
+**On VM1 (`187.10.1.1`)**:
 ```bash
-sudo ip link add vxlan10 type vxlan id 10 remote 46.249.101.68 local 185.231.59.229 dstport 4789
+sudo ip link add vxlan10 type vxlan id 10 remote 187.20.1.1 local 187.10.1.1 dstport 4789
 sudo ip link set vxlan10 up
 sudo ip addr add 192.168.10.1/24 dev vxlan10
 ```
 
-**On VM2 (`46.249.101.68`)**:
+**On VM2 (`187.20.1.1`)**:
 ```bash
-sudo ip link add vxlan10 type vxlan id 10 remote 185.231.59.229 local 46.249.101.68 dstport 4789
+sudo ip link add vxlan10 type vxlan id 10 remote 187.10.1.1 local 187.20.1.1 dstport 4789
 sudo ip link set vxlan10 up
 sudo ip addr add 192.168.10.2/24 dev vxlan10
 ```
@@ -142,7 +142,7 @@ A successful `ping` and `curl` response (Nginx welcome page) confirms the setup.
 
 ## Network Diagram
 ```
-VM1 (185.231.59.229)          VM2 (46.249.101.68)
+VM1 (187.10.1.1)          VM2 (187.20.1.1)
    |                             |
    |--- container1 (10.0.0.2)    |--- container2 (10.0.0.3)
    |                             |
